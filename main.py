@@ -6,4 +6,6 @@ app = FastAPI()
 def hello_world():
     return {"message": "Hello world"}
 
-#Some comment to check git adding file
+@app.get("/hello/{name}")
+def read_item(name: str):
+    return f"Hello {name}"
