@@ -25,7 +25,7 @@ def read_method(request: Request):
     used_method = request.method
     return {'method': used_method}
 
-
-#@app.get("/{METHOD}")
-#def read_method(METHOD: str):
-#    return {"method": f'{METHOD}'}
+@app.put('/method')
+def read_method(request: Request):
+    used_method = request.method
+    return {'method': used_method}
