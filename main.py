@@ -40,13 +40,12 @@ class Patient(BaseModel):
     surname: str
 
 class PatientID(BaseModel):
-    app.counter+=1
     id: int
     patient: dict
 
 @app.post('/patient', response_model = PatientID)
 def get_patient(request: Patient):
-#    app.counter+=1
+    app.counter+=1
     return PatientID(id=app.counter, patient=request.dict())
 
 #---------- Homework 1 Problem 4
