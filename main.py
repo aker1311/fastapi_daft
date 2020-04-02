@@ -55,5 +55,5 @@ def add_patient(request: Patient):
 @app.get('/patient/{no}')
 def read_patient(no: int):
     if no not in [i.id for i in patients]:
-        raise HTTPException(status_code=404, detail="Patient not found")
+        raise HTTPException(status_code=204, detail="Patient not found")
     return patients[no-1].patient
