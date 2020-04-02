@@ -18,7 +18,6 @@ class Patient(BaseModel):
 def hello_world():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-
 #---------- Homework 1 Problem 1
 
 @app.get('/hello/{name}', response_model=HelloResp)
@@ -47,4 +46,4 @@ def read_method(request: Request):
 @app.post('/patient')
 def get_patient(patient: Patient):
     app.counter +=1
-    return {'id': str(app.counter), patient} 
+    return {'id': app.counter, 'patient': patient} 
