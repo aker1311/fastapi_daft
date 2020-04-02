@@ -43,7 +43,7 @@ def read_method(request: Request):
 
 #---------- Homework 1 Problem 3
 
-@app.post('/patient')
+@app.post('/patient', response_model = Patient)
 def get_patient(patient: Patient):
     app.counter +=1
     return {'id': app.counter, 'patient': patient} 
