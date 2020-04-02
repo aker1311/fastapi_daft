@@ -8,9 +8,6 @@ app.counter = 0
 class HelloResp(BaseModel):
     msg: str
 
-class Patient(BaseModel):
-    name: str
-    surname: str
 
 #-------------------------------------------------- 
 
@@ -28,22 +25,29 @@ def read_item(name: str):
 
 @app.get('/method')
 def read_method(request: Request):
-    used_method = request.method
-    return {'method': used_method}
+    return {'method': request.method}
 
 @app.post('/method')
 def read_method(request: Request):
-    used_method = request.method
-    return {'method': used_method}
+    return {'method': request.method}
 
 @app.put('/method')
 def read_method(request: Request):
-    used_method = request.method
-    return {'method': used_method}
-
+    return {'method': request.method}
+    
 #---------- Homework 1 Problem 3
 
-@app.post('/patient', response_model = Patient)
-def get_patient(patient: Patient):
-    app.counter +=1
-    return {'id': app.counter, 'patient': patient} 
+class Patient(BaseModel):
+    name: str 
+    surname: str
+
+class PatientID(BaseModel):
+    app.counter+=1
+    id: int
+    patient: dict
+
+@app.post('/patient', response_model = PatientID)
+def get_patient(request: Patient):
+    app.counter+=1
+    return PatientID(id=app.counter, patient=request.dict())
+
