@@ -1,8 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
+
+import json
 
 app = FastAPI()
 app.counter = 0
+patients = []
 
 class HelloResp(BaseModel):
     msg: str
@@ -10,7 +13,6 @@ class HelloResp(BaseModel):
 @app.get('/hello/{name}', response_model=HelloResp)
 def read_item(name: str):
     return HelloResp(msg=f"Hello {name}")
-
 #-------------------------------------------------- 
 
 #---------- Homework 1 Problem 1
@@ -43,10 +45,15 @@ class PatientID(BaseModel):
     patient: dict
 
 @app.post('/patient', response_model = PatientID)
-def get_patient(request: Patient):
+def add_patient(request: Patient):
     app.counter+=1
+    patients.append(PatientID(id=app.counter, patient=request.dict()))
     return PatientID(id=app.counter, patient=request.dict())
 
 #---------- Homework 1 Problem 4
 
-#@app.get('/patient/{id}', response_model = Patient
+@app.get('/patient/{no}')
+def read_patient(no: int):
+    if no not in [i.id for i in patients]:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return patients[no-1].patient
