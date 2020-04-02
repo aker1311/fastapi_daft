@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import json
 
 app = FastAPI()
-app.counter = 0
+app.counter =-1 
 patients = []
 
 class HelloResp(BaseModel):
