@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Request
+import json
 
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -46,7 +47,7 @@ class PatientID(BaseModel):
 @app.post('/patient', response_model = PatientID)
 def get_patient(request: Patient):
     app.counter+=1
-    return PatientID(id=app.counter, patient=request.dict())
+    return json.dumps(PatientID(id=app.counter, patient=request.dict()))
 
 #---------- Homework 1 Problem 4
 
