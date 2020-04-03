@@ -43,7 +43,7 @@ def read_method(request: Request):
 
 class Patient(BaseModel):
     name: str
-    surname: str
+    surename: str
 
 
 class PatientID(BaseModel):
