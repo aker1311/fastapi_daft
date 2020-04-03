@@ -54,11 +54,8 @@ class PatientID(BaseModel):
 
 @app.post('/patient', response_model=PatientID)
 def add_patient(request: Patient):
-    if patients==[]:
-        patients.append(PatientID(id=app.counter, patient=request.dict()))
-    else:
-        app.counter += 1
-        patients.append(PatientID(id=app.counter, patient=request.dict()))
+    app.counter+=1
+    patients.append(PatientID(id=app.counter, patient=request.dict()))
     return PatientID(id=app.counter, patient=request.dict())
 
 
