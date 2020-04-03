@@ -53,6 +53,8 @@ class PatientID(BaseModel):
 
 @app.post('/patient', response_model=PatientID)
 def add_patient(request: Patient):
+    global patients
+
     p = PatientID(id = app.counter, patient = request)
     app.counter+=1
     patients.append(p)
