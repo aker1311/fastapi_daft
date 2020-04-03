@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, JSONResponse
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -49,7 +49,7 @@ class Patient(BaseModel):
 
 class PatientID(BaseModel):
     id: int
-    patient: dict
+    patient: Patient 
 
 
 @app.post('/patient', response_model=PatientID)
@@ -64,5 +64,5 @@ def add_patient(request: Patient):
 @app.get('/patient/{pk}')
 def read_patient(pk: int):
     if pk not in [i.id for i in patients]:
-        raise HTTPException(status_code=204, detail="Patient not found")
+       return JSONResponse(status_code = 204, content = {}) 
     return patients[pk - 1].patient
