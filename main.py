@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 app.counter = 0
-patients = []
+global patients = []
 
 
 class HelloResp(BaseModel):
@@ -53,7 +53,6 @@ class PatientID(BaseModel):
 
 @app.post('/patient', response_model=PatientID)
 def add_patient(request: Patient):
-    global patients
 
     p = PatientID(id = app.counter, patient = request)
     app.counter+=1
@@ -64,7 +63,6 @@ def add_patient(request: Patient):
 
 @app.get('/patient/{pk}')
 def read_patient(pk: int):
-    global patients
 
     if pk not in [i.id for i in patients]:
        return JSONResponse(status_code = 204, content = {}) 
