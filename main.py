@@ -4,7 +4,8 @@ from pydantic import BaseModel
 
 app = FastAPI()
 app.counter = 0
-global patients = []
+global patients
+patients = []
 
 
 class HelloResp(BaseModel):
