@@ -1,6 +1,7 @@
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.templating import Jinja2Templates
 
 from pydantic import BaseModel
 
@@ -10,11 +11,13 @@ import secrets
 
 app = FastAPI()
 security = HTTPBasic()
+templates = Jinja2Templates(directory = "templates")
 
 app.counter = 0
 app.secret_key = '432A462D4A614E645267556B58703273357538782F413F4428472B4B62506553'
 patients = []
 app.sessions = []
+app.users = []
 
 
 class HelloResp(BaseModel):
@@ -44,6 +47,7 @@ def get_current_user(response: Response, credentials: HTTPBasicCredentials = Dep
         session_token = sha256(bytes(f"{user}{passw}{app.secret_key}", encoding = 'utf8')).hexdigest()
         if not (session_token in app.sessions):
             app.sessions.append(session_token)
+            app.users.append(user)
         return session_token 
 
 # ------------------------------------------------------  
@@ -68,11 +72,12 @@ def hello_world():
     
 @app.post('/welcome')
 @app.get('/welcome')
-def welcome(cookie: str = Cookie(None)):
+def welcome(request: Request, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
-    return {"message": "Welcome user"}
-
+    user = app.users[0]
+    print(user)
+    return templates.TemplateResponse('welcome.html', {"request": request,"username": user})
 
 @app.get('/hello/{name}', response_model=HelloResp)
 def read_item(name: str, cookie: str = Cookie(None)):
