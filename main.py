@@ -50,12 +50,6 @@ def get_current_user(response: Response, credentials: HTTPBasicCredentials = Dep
             app.sessions.append(session_token)
         return session_token 
 
-
-def check(cookie: str = Cookie(None)):
-    if not (cookie in app.sessions):
-        cookie = None
-    return cookie
-
 # ------------------------------------------------------  
 
 @app.post('/login')
@@ -64,45 +58,20 @@ def login(response: Response, cookie: str = Depends(get_current_user)):
     return RedirectResponse(url='/welcome') 
 
 @app.post('/logout')
-def logout(response: Response, cookie: str = Depends(check)):
+def logout(response: Response, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
+    response = RedirectResponse(url='/', status_code = 302)
     app.sessions = []
-    return RedirectResponse(url='/') 
+    return response
 
 @app.post('/')
 @app.get('/')
 def hello_world():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-@app.post('/welcome')
-@app.get('/welcome')
-def welcome():
-    if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
-    return {"message": "Welcome user"}
-
-
-@app.get('/hello/{name}', response_model=HelloResp)
-def read_item(name: str, cookie: str = Depends(check)):
-    if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
-    return HelloResp(msg=f"Hello {name}")
-
-
-@app.post('/patient', response_model=PatientID)
-def add_patient(request: Patient, cookie: str = Depends(check)):
-    if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
-    global patients
-    p = PatientID(id = app.counter, patient = request)
-    app.counter+=1
-    patients.append(p)
-    return p
-
-
-@app.get('/patient/{pk}')
-def read_patient(pk: int, cookie: str = Depends(check)):
+@app.post('/welcome'
+def read_patient(pk: int, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
     global patients
