@@ -115,11 +115,8 @@ def read_patient(pk: int, cookie: str = Cookie(None)):
     return patients[pk].patient
 
 @app.delete('/patient/{pk}')
-def delete_patient(pk: int, cookie: str = Cookie(None)):
+def delete_patient(pk: int, response: Response, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
-        raise HTTPException(status_code=401, detail="Unathorised")
-    global patients
-    if pk not in [i.id for i in patients]:
         raise HTTPException(status_code=401, detail="Unathorised")
     patients.pop(pk) 
     response.status_code = status.HTTP_204_NO_CONTENT
