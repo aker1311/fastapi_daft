@@ -55,7 +55,8 @@ def get_current_user(response: Response, credentials: HTTPBasicCredentials = Dep
 @app.post('/login')
 def login(response: Response, cookie: str = Depends(get_current_user)):
     response.set_cookie(key = 'cookie', value = cookie)
-    return RedirectResponse(url='/welcome') 
+    response.status_code = status.HTTP_302_FOUND
+    response.headers["Location"] = '/welcome'
 
 @app.post('/logout')
 def logout(response: Response, cookie: str = Cookie(None)):
@@ -70,7 +71,6 @@ def logout(response: Response, cookie: str = Cookie(None)):
 def hello_world():
     return {"message": "Hello World during the coronavirus pandemic!"}
     
-@app.post('/welcome')
 @app.get('/welcome')
 def welcome(request: Request, response: Response, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
