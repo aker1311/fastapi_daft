@@ -57,10 +57,9 @@ def login(response: Response, cookie: str = Depends(get_current_user)):
 def logout(response: Response, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
-    response = RedirectResponse(url='/', status_code = 302)
-    app.sessions = []
-    return response
-
+    response.delete_cookie(key='cookie')
+    app.sessions.clear()
+    return RedirectResponse(url='/')
 
 @app.post('/')
 @app.get('/')
