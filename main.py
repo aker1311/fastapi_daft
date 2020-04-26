@@ -65,16 +65,14 @@ def login(response: Response, cookie: str = Depends(get_current_user)):
 
 @app.post('/logout')
 def logout(response: Response, cookie: str = Depends(check)):
-    if cookie is None:
-        return "ERROR KURWA"
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
     app.sessions = []
     return RedirectResponse(url='/') 
 
 @app.post('/')
 @app.get('/')
-def hello_world(cookie: str = Depends(check)):
-    if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
+def hello_world():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
 @app.post('/welcome')
