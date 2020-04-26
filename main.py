@@ -63,28 +63,39 @@ def login(response: Response, cookie: str = Depends(get_current_user)):
     response.set_cookie(key = 'cookie', value = cookie)
     return RedirectResponse(url='/welcome') 
 
+@app.post('/logout')
+def logout(response: Response, cookie: str = Depends(check)):
+    if cookie is None:
+        return "ERROR KURWA"
+    app.sessions = []
+    return RedirectResponse(url='/') 
 
-
-
+@app.post('/')
 @app.get('/')
-def hello_world():
+def hello_world(cookie: str = Depends(check)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
     return {"message": "Hello World during the coronavirus pandemic!"}
 
 @app.post('/welcome')
 @app.get('/welcome')
 def welcome():
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
     return {"message": "Welcome user"}
 
 
 @app.get('/hello/{name}', response_model=HelloResp)
-def read_item(name: str, cookie: str = Cookie(None)):
+def read_item(name: str, cookie: str = Depends(check)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
     return HelloResp(msg=f"Hello {name}")
 
 
 @app.post('/patient', response_model=PatientID)
-def add_patient(request: Patient):
+def add_patient(request: Patient, cookie: str = Depends(check)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
     global patients
     p = PatientID(id = app.counter, patient = request)
     app.counter+=1
@@ -93,14 +104,10 @@ def add_patient(request: Patient):
 
 
 @app.get('/patient/{pk}')
-def read_patient(pk: int):
+def read_patient(pk: int, cookie: str = Depends(check)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
     global patients
     if pk not in [i.id for i in patients]:
        return JSONResponse(status_code = 204, content = {}) 
     return patients[pk].patient
-
-
-@app.get('/cookie')
-def check_cookie(response: Response, cookie: str = Depends(check)):
-    return {'cookie': response} 
-
