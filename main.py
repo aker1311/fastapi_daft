@@ -74,7 +74,7 @@ def hello_world():
 @app.get('/welcome')
 def welcome(request: Request, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
+        raise HTTPException(status_code=401, detail="Unathorised")
     user = app.users[0]
     print(user)
     return templates.TemplateResponse('welcome.html', {"request": request,"username": user})
