@@ -69,7 +69,7 @@ def hello_world():
     
 @app.post('/welcome')
 @app.get('/welcome')
-def welcome():
+def welcome(cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
     return {"message": "Welcome user"}
