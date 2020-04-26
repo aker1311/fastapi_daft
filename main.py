@@ -76,14 +76,14 @@ def welcome():
 
 
 @app.get('/hello/{name}', response_model=HelloResp)
-def read_item(name: str, cookie: str = Depends(check)):
+def read_item(name: str, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
     return HelloResp(msg=f"Hello {name}")
 
 
 @app.post('/patient', response_model=PatientID)
-def add_patient(request: Patient, cookie: str = Depends(check)):
+def add_patient(request: Patient, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
     global patients
