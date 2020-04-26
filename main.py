@@ -77,7 +77,7 @@ def welcome(request: Request, cookie: str = Cookie(None)):
         raise HTTPException(status_code=401, detail="Unathorised")
     user = app.users[0]
     print(user)
-    return templates.TemplateResponse('welcome.html', {"request": request,"username": user})
+    return templates.TemplateResponse('welcome.html', {"request": request,"user": user})
 
 @app.get('/hello/{name}', response_model=HelloResp)
 def read_item(name: str, cookie: str = Cookie(None)):
