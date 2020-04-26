@@ -121,5 +121,5 @@ def delete_patient(pk: int, cookie: str = Cookie(None)):
     global patients
     if pk not in [i.id for i in patients]:
         raise HTTPException(status_code=401, detail="Unathorised")
-    return patients[pk].patient
+    patients.pop(pk) 
 
