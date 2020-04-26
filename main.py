@@ -102,7 +102,7 @@ def show_patients(request: Request, response: Response, cookie: str = Cookie(Non
         raise HTTPException(status_code=401, detail="Unathorised")
     global patients
     if len(patients)==0:
-        raise HTTPException(status_code = 401, detail = "Unathorised")
+        response.status_code = status.HTTP_204_NO_CONTENT
     return patients
 
 @app.get('/patient/{pk}')
@@ -122,4 +122,5 @@ def delete_patient(pk: int, cookie: str = Cookie(None)):
     if pk not in [i.id for i in patients]:
         raise HTTPException(status_code=401, detail="Unathorised")
     patients.pop(pk) 
+    response.status_code = status.HTTP_204_NO_CONTENT
 
