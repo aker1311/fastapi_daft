@@ -86,20 +86,40 @@ def read_item(name: str, cookie: str = Cookie(None)):
 
 
 @app.post('/patient', response_model=PatientID)
-def add_patient(request: Patient, cookie: str = Cookie(None)):
+def add_patient(request: Patient, response: Response, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
+        raise HTTPException(status_code=401, detail="Unathorised")
     global patients
     p = PatientID(id = app.counter, patient = request)
-    app.counter+=1
     patients.append(p)
-    return p
+    response.status_code = status.HTTP_302_FOUND
+    response.headers["Location"]=f"/patient/{app.counter}"
+    app.counter+=1
+
+@app.get('/patient')
+def show_patients(request: Request, response: Response, cookie: str = Cookie(None)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=401, detail="Unathorised")
+    global patients
+    if len(patients)==0:
+        raise HTTPException(status_code = 401, detail = "Unathorised")
+    return patients
 
 @app.get('/patient/{pk}')
 def read_patient(pk: int, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
-        raise HTTPException(status_code=403, detail="Unathorised")
+        raise HTTPException(status_code=401, detail="Unathorised")
     global patients
     if pk not in [i.id for i in patients]:
-       return JSONResponse(status_code = 204, content = {}) 
+        raise HTTPException(status_code=401, detail="Unathorised")
     return patients[pk].patient
+
+@app.delete('/patient/{pk}')
+def delete_patient(pk: int, cookie: str = Cookie(None)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=401, detail="Unathorised")
+    global patients
+    if pk not in [i.id for i in patients]:
+        raise HTTPException(status_code=401, detail="Unathorised")
+    return patients[pk].patient
+
