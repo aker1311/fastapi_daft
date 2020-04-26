@@ -61,6 +61,7 @@ def logout(response: Response, cookie: str = Cookie(None)):
     app.sessions = []
     return response
 
+
 @app.post('/')
 @app.get('/')
 def hello_world():
