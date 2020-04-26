@@ -28,10 +28,6 @@ class PatientID(BaseModel):
     id: int
     patient: Patient
 
-class User(BaseModel):
-    login: str
-    password: str
-
 # ------------------------------------------------------
 
 def get_current_user(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
@@ -69,8 +65,33 @@ def logout(response: Response, cookie: str = Cookie(None)):
 @app.get('/')
 def hello_world():
     return {"message": "Hello World during the coronavirus pandemic!"}
+    
+@app.post('/welcome')
+@app.get('/welcome')
+def welcome():
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
+    return {"message": "Welcome user"}
 
-@app.post('/welcome'
+
+@app.get('/hello/{name}', response_model=HelloResp)
+def read_item(name: str, cookie: str = Depends(check)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
+    return HelloResp(msg=f"Hello {name}")
+
+
+@app.post('/patient', response_model=PatientID)
+def add_patient(request: Patient, cookie: str = Depends(check)):
+    if cookie not in app.sessions:
+        raise HTTPException(status_code=403, detail="Unathorised")
+    global patients
+    p = PatientID(id = app.counter, patient = request)
+    app.counter+=1
+    patients.append(p)
+    return p
+
+@app.get('/patient/{pk}')
 def read_patient(pk: int, cookie: str = Cookie(None)):
     if cookie not in app.sessions:
         raise HTTPException(status_code=403, detail="Unathorised")
