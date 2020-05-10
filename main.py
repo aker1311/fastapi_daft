@@ -136,7 +136,8 @@ class Album(BaseModel):
     artist_id: int
 
 class Customer(BaseModel):
-    company: str = None 
+    company: str = None
+    address: str = None
     city: str = None
     state: str = None
     country: str = None 
@@ -198,6 +199,7 @@ async def edit_customer(customer: Customer, customer_id: int):
     trimed = {k: v for k, v in update_customer.items() if v is not None}
     for i in trimed:
         I = i.capitalize()
+        print(I)
         command =f"UPDATE customers SET {I} = '{trimed[i]}' WHERE customerid = {customer_id}"
         print(command)
         update = app.db_connection.execute(command)
