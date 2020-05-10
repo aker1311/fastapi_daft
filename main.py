@@ -157,20 +157,20 @@ async def composer(composer_name: str = Query(None)):
     return names
 
 
-@app.post('/albums')
+@app.post('/albums', status_code = status.HTTP_201_CREATED)
 async def add_album(title: str, artist_id: int):
     app.db_connection.row_factory = lambda cursor, row: row[0]
     artists = app.db_connection.execute(f"SELECT ArtistId FROM artists").fetchall()
     if artist_id not in artists:
         raise HTTPException(status_code=404, detail={"error": "No artist like that in the database"})
     app.db_connection.row_factory = sqlite3.Row
-    app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (title, artist_id, ))
+    insert = app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (title, artist_id, ))
     app.db_connection.commit()
-    result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE title = ?", (title,)).fetchall()
+    result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE albumid = ?", (insert.lastrowid,)).fetchall()
     return result
 
 @app.get('/albums/{album_id}')
-async def album(album_id: int):
+async def album(album_id: int, response: Response):
     app.db_connection.row_factory = lambda cursor, row: row[0]
     albums = app.db_connection.execute(f"SELECT albumid FROM albums").fetchall()
     if album_id not in albums:
