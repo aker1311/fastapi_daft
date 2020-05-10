@@ -130,6 +130,10 @@ def logout(response: Response, cookie: str = Cookie(None)):
 
 # ---Homework 4------------------------------------------
 
+class Album(BaseModel):
+    title: str
+    artist_id: int
+
 @app.on_event("startup")
 async def startup():
     app.db_connection = sqlite3.connect('chinook/chinook.db')
@@ -158,16 +162,15 @@ async def composer(composer_name: str = Query(None)):
 
 
 @app.post('/albums', status_code = status.HTTP_201_CREATED)
-async def add_album(title: str, artist_id: int):
+async def add_album(album: Album):
     app.db_connection.row_factory = sqlite3.Row 
-    find = app.db_connection.execute(f"SELECT ArtistId FROM artists WHERE ArtistId = ?", (artist_id,)).fetchone()
-    print(find)
+    find = app.db_connection.execute(f"SELECT ArtistId FROM artists WHERE ArtistId = ?", (album.artist_id,)).fetchone()
     if find is None:
         raise HTTPException(status_code=404, detail={"error": "No artist like that in the database"})
-    insert = app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (title, artist_id, ))
+    insert = app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (album.title, album.artist_id, ))
     app.db_connection.commit()
     result = app.db_connection.execute(f"SELECT * FROM albums WHERE albumid = ?", (insert.lastrowid,)).fetchall()
-    return result[0]
+    return {"AlbumId": insert.lastrowid, "Title": album.title, "ArtistId": album.artist_id}
 
 @app.get('/albums/{album_id}')
 async def album(album_id: int):
