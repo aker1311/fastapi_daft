@@ -142,6 +142,14 @@ async def shutdown():
 @app.get('/tracks/')
 async def tracks(page: int = Query(0), per_page:int = Query(10)):
     app.db_connection.row_factory = sqlite3.Row
-    data = app.db_connection.execute(f"SELECT *  FROM tracks LIMIT {per_page} OFFSET {page * per_page}").fetchall()
+    data = app.db_connection.execute(f"SELECT * FROM tracks LIMIT {per_page} OFFSET {page * per_page}").fetchall()
     return data  
 
+@app.get('/tracks/composers/')
+async def composer(composer_name: str = Query(None)):
+    app.db_connection.row_factory = lambda cursor, row: row[0]
+    data = app.db_connection.execute(f"SELECT DISTINCT composer FROM tracks").fetchall()
+    if composer_name not in data:
+        raise HTTPException(status_code=404, detail={"error": composer_name})
+    names = app.db_connection.execute(f"SELECT name FROM tracks WHERE composer = ? ORDER BY name", (composer_name, )).fetchall()
+    return names 
