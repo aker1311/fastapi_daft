@@ -1,4 +1,5 @@
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Request, Response, status, Query
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
@@ -135,7 +136,7 @@ class Album(BaseModel):
     artist_id: int
 
 class Customer(BaseModel):
-    company: str = None
+    company: str = None 
     city: str = None
     state: str = None
     country: str = None 
@@ -191,4 +192,7 @@ async def album(album_id: int):
 async def edit_customer(customer: Customer, customer_id: int):
     app.db_connection.row_factory = sqlite3.Row
     res = app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id, )).fetchone()
-    return res
+    if res is None:
+        raise HTTPException(status_code=404, detail={"error": "Customer not found"})
+    upd  = {key: val for key, val in customer.__dict__.items() if val is not None}
+    print(upd)
