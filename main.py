@@ -139,11 +139,13 @@ async def startup():
 async def shutdown():
     app.db_connection.close()
 
+
 @app.get('/tracks/')
 async def tracks(page: int = Query(0), per_page:int = Query(10)):
     app.db_connection.row_factory = sqlite3.Row
     data = app.db_connection.execute(f"SELECT * FROM tracks LIMIT {per_page} OFFSET {page * per_page}").fetchall()
     return data  
+
 
 @app.get('/tracks/composers/')
 async def composer(composer_name: str = Query(None)):
@@ -152,4 +154,28 @@ async def composer(composer_name: str = Query(None)):
     if composer_name not in data:
         raise HTTPException(status_code=404, detail={"error": composer_name})
     names = app.db_connection.execute(f"SELECT name FROM tracks WHERE composer = ? ORDER BY name", (composer_name, )).fetchall()
-    return names 
+    return names
+
+
+@app.post('/albums')
+async def add_album(title: str, artist_id: int):
+    app.db_connection.row_factory = lambda cursor, row: row[0]
+    artists = app.db_connection.execute(f"SELECT ArtistId FROM artists").fetchall()
+    if artist_id not in artists:
+        raise HTTPException(status_code=404, detail={"error": "No artist like that in the database"})
+    app.db_connection.row_factory = sqlite3.Row
+    app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (title, artist_id, ))
+    app.db_connection.commit()
+    result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE title = ?", (title,)).fetchall()
+    return result
+
+@app.get('/albums/{album_id}')
+async def album(album_id: int):
+    app.db_connection.row_factory = lambda cursor, row: row[0]
+    albums = app.db_connection.execute(f"SELECT albumid FROM albums").fetchall()
+    if album_id not in albums:
+        raise HTTPException(status_code=404, detail={"error": "No album like that in the database"})
+    app.db_connection.row_factory = sqlite3.Row
+    result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE albumid = ?", (album_id,)).fetchall()
+    return result
+
