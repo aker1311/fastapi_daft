@@ -172,6 +172,6 @@ async def add_album(title: str, artist_id: int):
 @app.get('/albums/{album_id}')
 async def album(album_id: int):
     app.db_connection.row_factory = sqlite3.Row
-    result = app.db_connection.execute(f"SELECT * FROM albums WHERE albumid = ?", (album_id,)).fetchall()
-    return result[0]
+    result = app.db_connection.execute(f"SELECT * FROM albums WHERE albumid = ?", (album_id,)).fetchone()
+    return result
 
