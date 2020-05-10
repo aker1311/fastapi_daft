@@ -218,4 +218,10 @@ async def get_sales(category: str = Query(None)):
         ORDER BY sum DESC, invoices.customerid
         ''').fetchall()
         return cat
+    if category == 'genre':
+        app.db_connection.row_factory = sqlite3.Row
+        gen = app.db_connection.execute('''
+        SELECT genres.name, SUM(quantity) as Sum FROM invoice_items
+        '''.fetchall()
+        return gen
 
