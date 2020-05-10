@@ -134,6 +134,15 @@ class Album(BaseModel):
     title: str
     artist_id: int
 
+class Customer(BaseModel):
+    company: str = None
+    address: str = None
+    city: str = None
+    state: str = None
+    country: str = None
+    postalcode: str = None
+    fax: str = None
+
 @app.on_event("startup")
 async def startup():
     app.db_connection = sqlite3.connect('chinook/chinook.db')
@@ -178,3 +187,11 @@ async def album(album_id: int):
     result = app.db_connection.execute(f"SELECT * FROM albums WHERE albumid = ?", (album_id,)).fetchone()
     return result
 
+
+@app.put('/customers/{customer_id}')
+async def edit_customer(customer: Customer, customer_id: int):
+    app.db_connection.row_factory = sqlite3.Row
+    find = app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id, )).fetchone()
+    if find is None:
+        raise HTTPException(status_code=404, detail={"error": "Customer not found"})
+        
