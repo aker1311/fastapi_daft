@@ -222,6 +222,10 @@ async def get_sales(category: str = Query(None)):
         app.db_connection.row_factory = sqlite3.Row
         gen = app.db_connection.execute('''
         SELECT genres.name, SUM(quantity) as Sum FROM invoice_items
-        '''.fetchall()
+        JOIN genres ON tracks.genreid = genres.genreid
+        JOIN tracks ON invoice_items.trackid = tracks.trackid
+        GROUP BY tracks.genreid 
+        ORDER BY Sum DESC, genres.name
+        ''').fetchall()
         return gen
 
