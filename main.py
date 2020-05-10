@@ -197,6 +197,7 @@ async def edit_customer(customer: Customer, customer_id: int):
     update_customer = jsonable_encoder(customer)
     trimed = {k: v for k, v in update_customer.items() if v is not None}
     for i in trimed:
+        i.capitalize()
         command =f"UPDATE customers SET {i} = '{trimed[i]}' WHERE customerid = {customer_id}"
         print(command)
         update = app.db_connection.execute(command)
