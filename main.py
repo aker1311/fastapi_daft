@@ -166,16 +166,12 @@ async def add_album(title: str, artist_id: int):
     app.db_connection.row_factory = sqlite3.Row
     insert = app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (title, artist_id, ))
     app.db_connection.commit()
-    result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE albumid = ?", (insert.lastrowid,)).fetchall()
+    result = app.db_connection.execute(f"SELECT * FROM albums WHERE albumid = ?", (insert.lastrowid,)).fetchall()
     return result[0]
 
 @app.get('/albums/{album_id}')
-async def album(album_id: int, response: Response):
-    app.db_connection.row_factory = lambda cursor, row: row[0]
-    albums = app.db_connection.execute(f"SELECT albumid FROM albums").fetchall()
-    if album_id not in albums:
-        raise HTTPException(status_code=404, detail={"error": "No album like that in the database"})
+async def album(album_id: int):
     app.db_connection.row_factory = sqlite3.Row
-    result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE albumid = ?", (album_id,)).fetchall()
+    result = app.db_connection.execute(f"SELECT * FROM albums WHERE albumid = ?", (album_id,)).fetchall()
     return result[0]
 
