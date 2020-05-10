@@ -199,10 +199,28 @@ async def edit_customer(customer: Customer, customer_id: int):
     trimed = {k: v for k, v in update_customer.items() if v is not None}
     for i in trimed:
         I = i.capitalize()
-        print(I)
         command =f"UPDATE customers SET {I} = '{trimed[i]}' WHERE customerid = {customer_id}"
-        print(command)
         update = app.db_connection.execute(command)
         app.db_connection.commit()
     return app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id,)).fetchone()
-    
+
+
+@app.get('/sales')
+async def get_sales(category: str = Query(None)):
+    if category not in ['customers', 'genre']:
+        raise HTTPException(status_code=404, detail={"error": "Wrong category"})
+    if category == 'customers':
+        app.db_connection.row_factory = sqlite3.Row
+        cat = app.db_connection.execute('''
+        SELECT invoices.customerid, email, phone, ROUND(SUM(total), 2) as Sum FROM invoices 
+        JOIN customers ON invoices.customerid = customers.customerid 
+        GROUP BY invoices.customerid 
+        ORDER BY sum DESC, invoices.customerid
+        ''').fetchall()
+        return cat
+    if category == 'genres':
+        app.db_connection.row_factory = sqlite3.Row
+        gen = app.db_connection.execute('''
+        SELECT 
+
+
