@@ -207,7 +207,7 @@ async def edit_customer(customer: Customer, customer_id: int):
 
 @app.get('/sales')
 async def get_sales(category: str = Query(None)):
-    if category not in ['customers', 'genre']:
+    if category not in ['customers', 'genres']:
         raise HTTPException(status_code=404, detail={"error": "Wrong category"})
     if category == 'customers':
         app.db_connection.row_factory = sqlite3.Row
@@ -218,7 +218,7 @@ async def get_sales(category: str = Query(None)):
         ORDER BY sum DESC, invoices.customerid
         ''').fetchall()
         return cat
-    if category == 'genre':
+    if category == 'genres':
         app.db_connection.row_factory = sqlite3.Row
         gen = app.db_connection.execute('''
         SELECT genres.name, SUM(quantity) as Sum FROM invoice_items
