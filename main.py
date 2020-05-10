@@ -167,7 +167,7 @@ async def add_album(title: str, artist_id: int):
     insert = app.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?)", (title, artist_id, ))
     app.db_connection.commit()
     result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE albumid = ?", (insert.lastrowid,)).fetchall()
-    return result
+    return result[0]
 
 @app.get('/albums/{album_id}')
 async def album(album_id: int, response: Response):
@@ -177,5 +177,5 @@ async def album(album_id: int, response: Response):
         raise HTTPException(status_code=404, detail={"error": "No album like that in the database"})
     app.db_connection.row_factory = sqlite3.Row
     result = app.db_connection.execute(f"SELECT albumid, title, artistid FROM albums WHERE albumid = ?", (album_id,)).fetchall()
-    return result
+    return result[0]
 
