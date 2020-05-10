@@ -190,8 +190,8 @@ async def album(album_id: int):
 @app.put('/customers/{customer_id}')
 async def edit_customer(customer: Customer, customer_id: int):
     app.db_connection.row_factory = sqlite3.Row
-    find = app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id, )).fetchone()
-    if find is not None:
-        return find
+    find = app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id, )).fetchall()
+    if find[0] is not None:
+        return find[0]
     raise HTTPException(status_code=404, detail={"error": "Customer not found"})
         
