@@ -194,5 +194,12 @@ async def edit_customer(customer: Customer, customer_id: int):
     res = app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id, )).fetchone()
     if res is None:
         raise HTTPException(status_code=404, detail={"error": "Customer not found"})
-    upd  = {key: val for key, val in customer.__dict__.items() if val is not None}
-    print(upd)
+    update_customer = jsonable_encoder(customer)
+    trimed = {k: v for k, v in update_customer.items() if v is not None}
+    for i in trimed:
+        command =f"UPDATE customers SET {i} = '{trimed[i]}' WHERE customerid = {customer_id}"
+        print(command)
+        update = app.db_connection.execute(command)
+        app.db_connection.commit()
+    return app.db_connection.execute(f"SELECT * FROM customers WHERE customerid = ?", (customer_id,)).fetchone()
+    
